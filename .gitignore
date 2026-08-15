@@ -4,4 +4,7 @@ build/
 # Signed APKs
 *.apk
 
+# Local working notes, not for the public repo (device serial, local paths)
+status.md
+
 .DS_Store
