@@ -63,6 +63,13 @@ Several things here were established by testing on the device, not assumed:
   fail, `pm suspend` returns `cmd restricted`. Force-stop works and does not
   survive a reboot, so the app reports it as information and deliberately does
   not let it drive the banner. An always-red indicator gets ignored.
+- **`killBackgroundProcesses` does not set the stopped flag.** Measured on
+  device: after calling it on `klmsagent` the process was gone from `ps`, but
+  `dumpsys` still reported `stopped=false`. Only a real force-stop sets it, and
+  `FORCE_STOP_PACKAGES` is signature-level. So the Stop button re-reads the
+  flag rather than assuming success, and routes to App info when it did not
+  flip — hiding the button on a kill alone would be a lie that unravels on the
+  next launch.
 - **Package counts are unstable for about a minute after boot** while the
   package manager finishes scanning (observed 491 settling to 493). Re-check
   before believing a diff taken immediately after a reboot.

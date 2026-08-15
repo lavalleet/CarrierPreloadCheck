@@ -1,6 +1,7 @@
 package com.tomlavallee.carriercheck;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -380,7 +381,61 @@ public class MainActivity extends Activity {
             row.addView(note);
         }
 
+        // Only offered while the package is actually running. Once it is
+        // stopped the next render drops this button entirely.
+        if (w.expect == EXPECT_STOPPED && r.level == NOTE) {
+            row.addView(stopButtonFor(w.pkg));
+        }
+
         root.addView(row);
+    }
+
+    private Button stopButtonFor(final String pkg) {
+        Button b = new Button(this);
+        b.setText("Stop " + labelOf(pkg));
+        b.setOnClickListener(v -> attemptStop(pkg));
+
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        p.setMargins(0, dp(8), 0, dp(2));
+        b.setLayoutParams(p);
+        return b;
+    }
+
+    /**
+     * killBackgroundProcesses is the strongest stop available to an unprivileged
+     * app. It frees the memory but does not set the stopped flag -- only a real
+     * force-stop does that -- so the result is re-read afterwards rather than
+     * assumed, and the user is sent to App info if the flag did not flip.
+     */
+    private void attemptStop(final String pkg) {
+        ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        if (am != null) {
+            try {
+                am.killBackgroundProcesses(pkg);
+            } catch (SecurityException e) {
+                // Permission refused; fall through to the App info route.
+            }
+        }
+
+        if (checkStopped(pkg).level == OK) {
+            Toast.makeText(this, labelOf(pkg) + " stopped", Toast.LENGTH_SHORT).show();
+            render();
+            return;
+        }
+
+        new AlertDialog.Builder(this)
+                .setTitle("Needs Force stop")
+                .setMessage("Background processes were killed, but only Force stop "
+                          + "marks " + pkg + " as stopped, and this app is not "
+                          + "allowed to do that. Open its App info screen?")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Open App info", (d, w) -> launch(
+                        new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                   Uri.parse("package:" + pkg)),
+                        pkg,
+                        "Tap Force stop on this screen."))
+                .show();
     }
 
     private void addBaselineSummary(int baselineSize, int currentSize) {

@@ -16,6 +16,13 @@
          system dialog does it, and the user confirms each one. -->
     <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
 
+    <!-- Lets the Stop button kill a package's background processes. This is NOT
+         force-stop: FORCE_STOP_PACKAGES is signature-level and unavailable to a
+         sideloaded app, and only force-stop sets the stopped flag this app
+         reads. If killing background processes is not enough, the button falls
+         back to opening App info, where Force stop is available. -->
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+
     <!-- Kept as well: QUERY_ALL_PACKAGES covers these, but naming them keeps
          the watch list working if the broad permission is ever dropped. -->
     <queries>
