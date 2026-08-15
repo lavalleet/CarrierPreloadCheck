@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.tomlavallee.carriercheck"
+    android:versionCode="1"
+    android:versionName="1.0">
+
+    <!-- The baseline diff has to enumerate every installed package, including
+         ones whose names cannot be known in advance, which is the entire point
+         of it. A queries block cannot express "everything", so this needs the
+         broad permission. Play Store policy restricts it; this app is
+         sideloaded and never distributed, so that does not apply. -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+
+    <!-- Lets the per-package Uninstall button hand a single package to the
+         system uninstaller. This app cannot uninstall anything itself: the
+         system dialog does it, and the user confirms each one. -->
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
+
+    <!-- Kept as well: QUERY_ALL_PACKAGES covers these, but naming them keeps
+         the watch list working if the broad permission is ever dropped. -->
+    <queries>
+        <package android:name="com.dti.att" />
+        <package android:name="com.facebook.system" />
+        <package android:name="com.facebook.appmanager" />
+        <package android:name="com.samsung.android.game.gos" />
+        <package android:name="com.samsung.klmsagent" />
+    </queries>
+
+    <application
+        android:label="Preload Check"
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:theme="@android:style/Theme.DeviceDefault.DayNight">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="Preload Check">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

@@ -1,0 +1,7 @@
+# Gradle-free build output (build.sh regenerates all of it)
+build/
+
+# Signed APKs
+*.apk
+
+.DS_Store
